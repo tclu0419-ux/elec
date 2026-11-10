@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>影像幾何轉換｜章節測驗</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#edf3f5;color:#132e39;font:16px/1.65 system-ui,sans-serif}header{background:#103643;color:white;padding:26px max(20px,calc((100% - 760px)/2));white-space:nowrap}header span{font-size:13px;letter-spacing:.16em;color:#a6e4da}header h1{font-size:clamp(24px,5vw,38px);margin:4px 0}main{width:min(760px,calc(100% - 32px));margin:24px auto 48px}article{background:white;border:1px solid #d9e5e8;border-radius:18px;padding:clamp(17px,5vw,34px);box-shadow:0 10px 30px #17333b0a}h2{line-height:1.42;margin:14px 0 20px}h2:focus{outline:none}.meta{display:flex;justify-content:space-between;gap:10px;color:#365c67;font-weight:700;font-size:14px}progress{width:100%;height:10px;accent-color:#00766b}button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid #b8cdd3;background:#f9fcfd;color:inherit;padding:10px 14px;text-align:left}button:focus-visible,summary:focus-visible{outline:3px solid #007e91;outline-offset:3px}.options{display:grid;gap:9px}.options button:hover:not(:disabled){background:#e9f5f6}.options button:disabled{cursor:default}.options .right{background:#dff5e8;border-color:#30875d}.options .wrong{background:#fce9e6;border-color:#bf6154}.action{background:#006b60;color:white;border-color:#006b60;font-weight:700;margin-top:16px}.feedback{margin-top:16px;background:#edf6f6;border-left:4px solid #00766b;padding:12px 15px;border-radius:6px}.feedback p{margin:5px 0}.ref{font-size:13px;color:#48646d}.score{font-size:42px;font-weight:800;color:#006b60}details{padding:9px 0;border-bottom:1px solid #dee9ec}summary{cursor:pointer}footer{font-size:13px;color:#48646d;margin-top:14px}
+</style>
+<header><span>CH 05 ／ 章節練習</span><h1>影像幾何轉換</h1></header>
+<main><article id="card"></article><footer>教材來源　CH 05 影像幾何轉換.pdf</footer></main>
+<script>
+const groups=[
+['影像縮放',[
+['點 (2,1) 以原點為中心，水平放大 2 倍、垂直放大 3 倍，結果為何？','(4,3)',['(6,2)','(4,2)','(2,3)'],'x′＝2×2＝4，y′＝3×1＝3。兩軸各用自己的倍率。','1–2'],
+['寬 4、高 4 的影像水平放大 2 倍，垂直維持原尺寸，輸出寬×高為何？','8×4',['4×8','8×8','4×4'],'寬乘 sₓ＝2，高乘 sᵧ＝1，所以陣列有 4 列、8 欄。','8–9'],
+['縮放矩陣的對角線為 (3,2,1)，點 (1,3) 會移到哪裡？','(3,6)',['(2,9)','(4,5)','(3,3)'],'x′＝3×1＝3，y′＝2×3＝6。齊次座標的最後一項維持 1。','1'],
+['寬、高各放大 2 倍時，輸出像素總數是原來的幾倍？','4 倍',['2 倍','6 倍','8 倍'],'像素數＝寬×高，兩軸各乘 2，所以總數乘 2×2＝4。','5、18'],
+['希望只將影像高度放大 3 倍，應選哪一組 (sₓ,sᵧ)？','(1,3)',['(3,1)','(3,3)','(1,1)'],'sₓ 控制寬度，sᵧ 控制高度，因此 x′＝x、y′＝3y。','1'],
+['在教材的 4×4 水平 2 倍案例中，來源 (2,1) 的灰階 120 會填入哪兩個位置？','(4,1) 與 (5,1)',['(4,1) 與 (4,2)','(2,2) 與 (3,2)','(5,1) 與 (6,1)'],'水平複製至 x′＝2×2 和 2×2＋1，垂直座標維持 y′＝1。','8–9'],
+['原圖寬 6、高 4，水平放大 3 倍、垂直放大 2 倍，輸出有多少個像素？','144',['48','72','120'],'輸出寬 18、高 8，因此共有 18×8＝144 個像素。','1、9'],
+['以原點為中心，兩軸皆縮為一半，座標 (6,4) 的變換結果為何？','(3,2)',['(12,8)','(3,4)','(5,3)'],'此題計算幾何座標。兩軸各乘 0.5，得到 (3,2)。','1']
+]],
+['最近鄰插值',[
+['依教材的整數倍放大程式，兩軸各放大 2 倍時，輸出座標 (5,3) 取自哪個來源座標？','(2,1)',['(3,2)','(1,2)','(5,3)'],'用整數除法回查：x＝5 // 2＝2，y＝3 // 2＝1。','14、18'],
+['兩軸各放大 2 倍，來源像素 (1,1) 的灰階值為 80。它對應的 2×2 區塊有哪些值？','四格都是 80',['只有左上為 80','每格都是 40','每格都是 160'],'這四個輸出座標的 x、y 各為 2 或 3。各座標整除 2 都回到 (1,1)，所以直接複製 80。','5、18'],
+['RGB 陣列形狀為 (100,200,3)，寬高各放大 2 倍後，形狀為何？','(200,400,3)',['(400,200,3)','(200,400,6)','(100,200,12)'],'形狀依序為高、寬、通道數。放大只改空間尺寸，仍保有 3 個通道。','14、18'],
+['已知來源座標 (x,y)＝(3,1)，依教材的陣列索引順序應讀取哪一格？','image[1,3]',['image[3,1]','image[2,4]','image[4,2]'],'陣列索引是 image[y,x]，先列後欄，從 0 起算。','8、14'],
+['為何放大後可能看見方塊感？','相鄰輸出像素會重複同一個來源值',['每格都取四鄰點平均','灰階值隨倍率增加','程式會刪除每隔一列的像素'],'最近鄰直接複製來源值。相同值連續排列，倍率越大時越容易看到區塊。','10、18'],
+['水平倍率 3、垂直倍率 2 時，輸出 (8,5) 回查哪個來源座標？','(2,2)',['(3,3)','(4,1)','(8,5)'],'x＝8 // 3＝2，y＝5 // 2＝2。兩個方向分別用各自的倍率。','14'],
+['最近鄰放大流程中，逐一走訪輸出座標的目的是什麼？','為每個輸出位置找到來源並填值',['先把所有來源值相加','求整張圖的平均亮度','改變來源陣列的通道數'],'反向映射從目的像素回查來源，再將來源值寫入當前輸出位置。','14、18'],
+['教材的 4×4 影像中，來源 (1,2) 灰階值為 200。兩軸各放大 2 倍後，輸出 (3,5) 是多少？','200',['80','255','0'],'(3 // 2, 5 // 2)＝(1,2)，因此取到來源灰階 200。','5–7、14']
+]],
+['影像旋轉',[
+['4×4 影像的索引從 0 起算，幾何中心在哪裡？','(1.5,1.5)',['(2,2)','(1,1)','(0,0)'],'兩軸座標都從 0 到 3，中心是端點的平均值 (0＋3)÷2＝1.5。','24'],
+['繞影像中心旋轉的正確步驟為何？','將中心移至原點 → 旋轉 → 移回原中心',['旋轉 → 移至原點 → 移回原中心','移回原中心 → 旋轉 → 移至原點','旋轉 → 縮放 → 裁切'],'先減去中心座標，使旋轉以該中心為基準。旋轉後再加回中心座標。','24–26'],
+['在教材的 4×4 順時針旋轉 90° 案例中，(1,1) 會移到哪裡？','(2,1)',['(1,2)','(2,2)','(1,1)'],'套用 x′＝3−y、y′＝x，得到 (3−1,1)＝(2,1)。','27–30'],
+['在教材的 4×4 影像中，順時針旋轉 90° 後，右上角 (3,0) 會移到哪裡？','右下角 (3,3)',['左上角 (0,0)','左下角 (0,3)','右上角 (3,0)'],'x′＝3−0＝3，y′＝3。y 向下增加，因此 (3,3) 是右下角。','27–30'],
+['4×4 影像繞中心順時針轉 90°，為何這個案例不需要插值？','每個來源像素都剛好對應一個整數格點',['所有像素的灰階值相同','旋轉後的座標都變成 0','旋轉矩陣等於單位矩陣'],'公式 (3−y,x) 將 0～3 的整數座標一對一映到同一網格。','27–30'],
+['任意角度旋轉時，反向映射得到的來源位置若落在有效範圍內、但不是整數格點，如何取得輸出像素值？','可用最近鄰或雙線性插值取樣',['一律填背景值','將角度加到像素值','直接把輸出座標當成來源座標'],'非整數位置要用來源格點估計。最近鄰選鄰近像素，雙線性則加權鄰點。','24–26'],
+['寬 8、高 4，座標從 0 開始，旋轉中心應設在哪裡？','(3.5,1.5)',['(4,2)','(1.5,3.5)','(7,3)'],'用 ((W−1)÷2,(H−1)÷2) 計算，x 的中點是 3.5，y 的中點是 1.5。','24'],
+['教材 4×4 順時針轉 90° 的例子中，來源 (1,2) 的灰階 150 會移到哪裡？','(1,1)',['(2,1)','(1,2)','(2,2)'],'將 (1,2) 代入 (3−y,x)，得到 (1,1)。剛好對上格點，灰階維持 150。','27–30']
+]]
+];
+const card=document.querySelector('#card'), count=9;
+let round=[], previous=[], answers=[], index=0;
+try{previous=JSON.parse(localStorage.getItem('geo-quiz-last')||'[]');if(!Array.isArray(previous))previous=[]}catch{}
+function element(tag,value,cls){const n=document.createElement(tag);n.textContent=value;if(cls)n.className=cls;return n}
+function shuffle(items){const copy=[...items];for(let i=copy.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]]}return copy}
+function action(label,callback){const b=element('button',label,'action');b.onclick=callback;return b}
+function start(){round=shuffle(groups.flatMap(([topic,questions],g)=>shuffle(questions.map(([prompt,correct,wrong,why,page],i)=>({id:g+'-'+i,topic,prompt,correct,wrong,why,page})).filter(q=>!previous.includes(q.id))).slice(0,3)));
+previous=round.map(q=>q.id);try{localStorage.setItem('geo-quiz-last',JSON.stringify(previous))}catch{}answers=[];index=0;question()}
+function question(){
+const q=round[index];card.replaceChildren();
+const meta=element('div','','meta');meta.append(element('span',q.topic),element('span','第 '+(index+1)+' / '+count+' 題'));
+const progress=document.createElement('progress');progress.max=count;progress.value=index;progress.setAttribute('aria-label','已完成題數');
+const heading=element('h2',q.prompt);heading.tabIndex=-1;
+const options=element('div','','options'), feedback=element('div','');feedback.setAttribute('aria-live','polite');
+let locked=false;
+shuffle([q.correct,...q.wrong]).forEach((value,i)=>{
+const b=element('button','ABCD'[i]+'．'+value);b.dataset.option=value;
+b.onclick=()=>{
+if(locked)return;locked=true;const ok=value===q.correct;answers.push({q,value,ok});progress.value=index+1;
+for(const option of options.children){option.disabled=true;if(option.dataset.option===q.correct){option.classList.add('right');option.append(' ✓ 正確答案')}else if(option===b){option.classList.add('wrong');option.append(' ✗ 你的選擇')}}
+feedback.className='feedback';feedback.append(element('strong',ok?'答對了':'答錯了｜正確答案為 '+q.correct),element('p',q.why),element('div','教材 PDF 第 '+q.page+' 頁','ref'));
+const next=action(index===count-1?'查看總分':'下一題',()=>{index++;if(index===count)result();else question()});card.append(next);next.focus();
+};options.append(b)});
+card.append(meta,progress,heading,options,feedback);heading.focus();
+}
+function result(){
+const correct=answers.filter(a=>a.ok).length;
+const title=element('h2','本回合成績');title.tabIndex=-1;
+card.replaceChildren(title,element('div',Math.round(100*correct/count)+' / 100 分','score'),element('p','答對 '+correct+' 題，共 '+count+' 題。每題等權重。'),action('重新抽題',start),element('h3','逐題回顧'));
+answers.forEach(({q,value,ok},i)=>{
+const d=document.createElement('details');d.append(element('summary',(ok?'✓ ':'✗ ')+(i+1)+'．'+q.prompt),element('p','你的答案：'+value+'｜正確答案：'+q.correct),element('p',q.why),element('div','教材 PDF 第 '+q.page+' 頁','ref'));card.append(d)
+});title.focus();
+}
+card.append(element('div','縮放 ／ 最近鄰插值 ／ 旋轉','meta'),element('h2','準備好挑戰這一章了嗎？'),element('p','每回合 9 題，每個主題各 3 題。選定答案後會立即顯示正解與解析，完成後可查看總分與逐題回顧。'),action('開始測驗',start));
+</script>
+</html>
